@@ -1,45 +1,149 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
+//import Loading_msg from "../components/LoadingPage";
 
 function Login() {
-  const [username, setUsername] = useState("");
+  const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const [scriptsLoaded, setScriptsLoaded] = useState(false);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [Loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   const f_onchange = (e) => {
-    setUsername(e.target.value);
+    setEmail(e.target.value);
   };
 
   const f_passchange = (e) => {
     setPassword(e.target.value);
   };
 
+  async function f_onsubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await axios.post(`http://localhost:5000/login`, {
+        email: email,
+        password: password,
+      });
+
+      setLoading(false);
+      console.log(res);
+
+      if (res.data && res.data.error) {
+        toast.error(res.data.error, {
+          position: "top-right",
+          duration: 3000,
+        });
+      } else if (res.data) {
+        const { token, redirectUrl } = res.data;
+        localStorage.setItem("token", token);
+
+        if (redirectUrl) {
+          navigate(redirectUrl);
+        } else {
+          toast.error("An error occured", {
+            position: "top-right",
+            duration: 3000,
+          });
+        }
+      }
+    } catch (e) {
+      setLoading(false);
+      console.error(e); // Log the entire error object
+      toast.error("An unexpected error occured", {
+        position: "top-right",
+        duration: 3000,
+      });
+    }
+  }
+
+  useEffect(() => {
+    const loadScript = (src, callback) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.async = true;
+
+      script.onload = callback;
+
+      document.body.appendChild(script);
+    };
+
+    loadScript("/js/jquery.min.js", () => {
+      loadScript("/js/popper.js", () => {
+        loadScript("/js/bootstrap.min.js", () => {
+          // All scripts are loaded
+          setScriptsLoaded(true);
+        });
+      });
+    });
+  }, []);
   return (
-    <html lang="en">
+    <>
       <head>
+        <style>
+          {`
+      html {
+  background-color: #58149f;
+  color: #FFFFFF;
+  font-family: 'Jost', sans-serif;
+}
+`}
+        </style>
         <link rel="icon" type="image/png" href="/landing_page/rupee.png" />
         <title>PennyWise-Login</title>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css"
+        />
         <link rel="stylesheet" href="/login/login.css" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
-        <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Jost&family=Lato&family=Montserrat:wght@300;400&display=swap" rel="stylesheet" />
       </head>
+
       <body>
+        <Toaster />
         <div className="container d-flex justify-content-center">
-          <img className="login-image" src="/login/login.png" alt="login" style={{ marginTop: '100px' }} />
+          <img
+            className="login-image"
+            src="/login/login.png"
+            alt="login"
+            style={{ marginTop: "100px" }}
+          />
           <div className="login-container">
-            <img className="PennyWise_logo" src="/landing_page/PennyWise_logo.png" />
+            <img
+              className="PennyWise_logo"
+              src="/landing_page/PennyWise_logo.png"
+              alt="PennyWise Logo"
+            />
             <h2>Login to Continue</h2>
-            
-            <form action="/login" method="post">
+            <form onSubmit={f_onsubmit}>
               <div className="form-group">
-                <label htmlFor="email-or-phone">Username</label>
-                <input onChange={f_onchange} value={username} type="text" className="form-control" id="email-or-phone" name="username" required />
+                <label htmlFor="email-or-phone">Email</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="email-or-phone"
+                  name="email"
+                  value={email}
+                  onChange={f_onchange}
+                  required
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="password">Password</label>
-                <input onChange={f_passchange} value={password} type="password" className="form-control" id="password" name="password" required />
+                <input
+                  type="password"
+                  className="form-control"
+                  id="password"
+                  name="password"
+                  onChange={f_passchange}
+                  value={password}
+                  required
+                />
                 <a href="" className="forgot-password">
                   Forgot Password?
                 </a>
@@ -53,13 +157,9 @@ function Login() {
             </form>
           </div>
         </div>
-
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
       </body>
-    </html>
-  )
+    </>
+  );
 }
 
-export default Login
+export default Login;
