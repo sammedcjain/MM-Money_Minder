@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import $ from "jquery";
 import Navbar from "../components/Navbar";
 import LoadingPage from "../components/Loading";
 import NotAuth from "../components/NotAuth";
@@ -70,6 +69,8 @@ function Dashboard() {
         console.log(response.data);
         setExpenses(response.data.expenses);
         setItems(response.data.items);
+        console.log(response.data.user);
+
         setUser(response.data.user);
 
         setAuthUser(true);
@@ -213,9 +214,6 @@ function Dashboard() {
       <>
         <Toaster />
         <link rel="icon" type="image/png" href="/landing_page/rupee.png" />
-        <title>PennyWise-Dashboard</title>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
           rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -241,6 +239,7 @@ function Dashboard() {
                 name="date"
                 onChange={handleChange}
                 value={formData.date}
+                max={new Date().toISOString().split("T")[0]}
                 required
               />
               <label htmlFor="item">Item:</label>
