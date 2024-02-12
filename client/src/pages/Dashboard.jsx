@@ -413,7 +413,7 @@ function Dashboard() {
           <div className="container table-responsive">
             <table id="data-table">
               <thead>
-                <tr id="table-data">
+                <tr>
                   <th>Item</th>
                   <th>Amount in Rs</th>
                   <th>Date</th>

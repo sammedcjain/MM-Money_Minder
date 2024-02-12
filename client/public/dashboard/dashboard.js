@@ -19,22 +19,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Get references to the relevant elements
 var sortSelect = document.getElementById("sort-select");
-var hideOrNot = document.querySelector(".hide_or_not");
+  var hideOrNot = document.querySelector(".hide_or_not");
 
-// Function to handle the change event of the sort-select dropdown
-function handleSortSelectChange() {
-  var selectedOption = sortSelect.value;
+  // Function to handle the change event of the sort-select dropdown
+  function handleSortSelectChange() {
+    var selectedOption = sortSelect.value;
 
-  // Check the selected option and hide/show the hideOrNot element accordingly
-  if (selectedOption === "date_asc" || selectedOption === "date_dec") {
-    hideOrNot.style.display = "none";
-  } else {
-    hideOrNot.style.display = "block";
+    // Check the selected option and hide/show the hideOrNot element accordingly
+    if (selectedOption === "date_asc" || selectedOption === "date_dec") {
+      hideOrNot.style.display = "none";
+    } else {
+      hideOrNot.style.display = "block";
+    }
   }
-}
 
-// Attach the event listener to the sort-select dropdown
-sortSelect.addEventListener("change", handleSortSelectChange);
+  // Attach the event listener to the sort-select dropdown
+  sortSelect.addEventListener("change", handleSortSelectChange);
 
 // Store the initial data
 // Store the initial data
@@ -60,9 +60,9 @@ function handleSortSelectChange() {
 sortSelect.addEventListener("change", handleSortSelectChange);
 
 // Get the table rows and store the initial data
-var tableRows = document.getElementById("table-data");
-console.log(tableRows.length);
-if (tableRows.length > 0) {
+var tableRows = document.getElementById("table-data tr");
+// console.log(tableRows.length);
+if (tableRows?.length > 0) {
   for (let i = 1; i < tableRows.length; i++) {
     con
     const item = {
@@ -90,19 +90,22 @@ document
   .addEventListener("submit", function (event) {
     event.preventDefault();
     const filter = event.target.elements.sort_select.value;
-    console.log(filter);
+    const dateInput = event.target.elements.date_input.valueAsDate;
+
+    console.log("Selected Filter:", filter);
+    console.log("Selected Date:", dateInput);
 
     let items = [...initialData]; // Use a copy of the initial data
 
     // Apply filter based on date if selected
-    if (filter !== "date_asc" && filter !== "date_dec") {
-      const data = event.target.elements.date_input.valueAsDate;
-      if (data) {
-        const selectedDate = data.toDateString();
-        items = items.filter(
-          (item) => item.date.toDateString() === selectedDate
-        );
-      }
+    if (filter !== "date_asc" && filter !== "date_dec" && dateInput) {
+      const selectedDate = dateInput.toISOString().split("T")[0];
+      console.log("Selected Date (ISO):", selectedDate);
+
+      items = items.filter(
+        (item) => item.date.toISOString().split("T")[0] === selectedDate
+      );
+      console.log("Filtered Items:", items);
     }
 
     // Apply sorting based on the selected filter
@@ -118,17 +121,17 @@ document
       items.sort((a, b) => b.date.getTime() - a.date.getTime());
     }
 
-    const tbody = document.getElementsByTagName("tbody")[0];
-    while (tbody.hasChildNodes()) {
-      tbody.removeChild(tbody.firstChild);
-    }
+      const tbody = document.getElementsByTagName("tbody")[0];
+      while (tbody.hasChildNodes()) {
+        tbody.removeChild(tbody.firstChild);
+      }
 
-    if (items.length === 0) {
-      document.getElementById("no-elements-message").innerText =
-        "No elements found for this date.";
-      document.getElementById("data-table").classList.add("hidden");
-      document.getElementById("no_element").classList.remove("hidden");
-    } else {
+      if (items.length === 0) {
+        document.getElementById("no-elements-message").innerText =
+          "No elements found for this date.";
+        document.getElementById("data-table").classList.add("hidden");
+        document.getElementById("no_element").classList.remove("hidden");
+      } else {
       document.getElementById("data-table").classList.remove("hidden");
       document.getElementById("no-elements-message").innerText = "";
       document.getElementById("no_element").classList.add("hidden");

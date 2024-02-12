@@ -2,6 +2,8 @@ import { IoMdLogOut } from "react-icons/io";
 
 function Navbar(props) {
   const { user } = props;
+
+  // console.log(user);
   return (
     <>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -45,7 +47,7 @@ function Navbar(props) {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href='/${user}/dashboard'>
+              <a className="nav-link" href='/user/dashboard'>
                 Dashboard
               </a>
             </li>
@@ -54,12 +56,7 @@ function Navbar(props) {
                 Insights
               </a>
             </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/:user/loans">
-                Track Loans
-              </a>
-            </li>
-            <li className="nav-item mobile_only">
+            <li className="nav-item dropdown desktop_only">
               {" "}
               <h5>
                 <a href="/logout">
@@ -74,14 +71,13 @@ function Navbar(props) {
               </h5>{" "}
             </li>
           </ul>
-          <ul
+          {/* <ul
             className="navbar-nav last_nav"
             style={{ marginRight: "0px", marginLeft: "65px" }}
           >
             <li className="nav-item dropdown desktop_only">
               <a
                 className="nav-link dropdown-toggle"
-                href="#"
                 id="userDropdown"
                 role="button"
                 data-toggle="dropdown"
@@ -103,7 +99,7 @@ function Navbar(props) {
                 </h5>
               </div>
             </li>
-          </ul>
+          </ul> */}
         </div>
       </nav>
     </>
