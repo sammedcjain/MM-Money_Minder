@@ -32,11 +32,13 @@ router.post("/add", async (req, res) => {
   const title = req.body.title;
   const amount = req.body.amount;
   const cat = req.body.category;
+  const p_method = req.body.payment_method;
   const newExpense = {
     Amount: amount,
     description: title,
     date: added_date,
     category: cat,
+    payment_method: p_method,
   };
 
   try {
