@@ -243,7 +243,7 @@ function Insights() {
     <>
       <head>
         <link rel="icon" type="image/png" href="/landing_page/rupee.png" />
-        <title>MoneyMinder-Insights</title>
+        <title>PennyWise-Insights</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
@@ -273,8 +273,7 @@ function Insights() {
             <button className="inp-but">+</button>
           </form>
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <button className="inp-but mid_button" onClick={clearFilter}
-            style={{ background: "#401c64" }}>
+            <button className="inp-but" onClick={clearFilter}>
               Clear filter
             </button>
           </div>
@@ -332,7 +331,7 @@ function Insights() {
             />
 
             <button className="inp-but" type="submit">
-              +
+              Apply filter
             </button>
           </form>
           <div
