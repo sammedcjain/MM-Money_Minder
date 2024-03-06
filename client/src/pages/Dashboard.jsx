@@ -18,6 +18,7 @@ function Dashboard() {
     date: "",
     amount: 0,
     category: "",
+    payment_method:"",
   });
   function handleChange(e) {
     const { name, value } = e.target;
@@ -109,6 +110,7 @@ function Dashboard() {
             title: formData.title,
             amount: formData.amount,
             category: formData.category,
+            payment_method: formData.payment_method,
           },
           {
             headers,
@@ -287,6 +289,21 @@ function Dashboard() {
                 <option value="Travel">Travel</option>
                 <option value="Miscellaneous">Miscellaneous</option>
               </select>
+              <label htmlFor="payment_method">Payment Method:</label>
+              <select
+                name="payment_method"
+                value={formData.payment_method}
+                onChange={handleChange}
+                required
+              >
+                <option value="" disabled defaultValue>
+                  Select an option
+                </option>
+                <option value="UPI">UPI</option>
+                <option value="Cash">Cash</option>
+                <option value="CC">Credit Card</option>
+                <option value="DC">Debit Card</option>
+              </select>
               <button type="submit" className="inp-but">
                 +
               </button>
@@ -322,6 +339,9 @@ function Dashboard() {
                         <p className="card_p">{expenseItem.description}</p>
                         <div className="pt-2 mt-2 border-top">
                           <p className="card_p">Rs {expenseItem.Amount}</p>
+                        </div>
+                        <div className="pt-2 mt-2 border-top">
+                          <p className="card_p">{expenseItem.payment_method}</p>
                         </div>
                       </blockquote>
                     </div>

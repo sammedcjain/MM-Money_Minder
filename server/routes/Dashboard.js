@@ -9,7 +9,8 @@ router.get("/", async (req, res) => {
     user: req.user.id,
   }).populate("user");
   const expenses = userExpense.expense;
-
+  const budget = userExpense.budget;
+  
   const user = await User.findById(req.user.id);
   var username = "";
   if (user) {
@@ -22,6 +23,7 @@ router.get("/", async (req, res) => {
   const expenDetails = {
     expenses: expenses,
     user: username,
+    budget: budget,
     items: [],
   };
   res.json(expenDetails);
@@ -32,11 +34,13 @@ router.post("/add", async (req, res) => {
   const title = req.body.title;
   const amount = req.body.amount;
   const cat = req.body.category;
+  const p_method = req.body.payment_method;
   const newExpense = {
     Amount: amount,
     description: title,
     date: added_date,
     category: cat,
+    payment_method: p_method,
   };
 
   try {
@@ -46,10 +50,27 @@ router.post("/add", async (req, res) => {
     await expense.expense.push(newExpense);
     await expense.save();
     res.json({ message: "Successfully posted" });
-    // res.redirect(`/${req.params.user}/dashboard`);
+    // res.redirect(/${req.params.user}/dashboard);
   } catch (e) {
     console.log(e);
     res.json({ error: "Error" });
+  }
+});
+
+router.post("/addbudget", async (req, res) => {
+  const entered_budget = req.body.budget;
+
+  try {
+    Expense.updateOne({ user: req.user.id }, { budget: entered_budget  }).then((result) => {
+      if (result.modifiedCount > 0) {
+        res.json({ message: "budget updated" });
+      } else {
+        res.json({ error: "budget not modified!" });
+      }
+    });
+  } catch (err) {
+    console.log(err);
+    res.json({ error: "error occurred!" });
   }
 });
 

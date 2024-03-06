@@ -37,6 +37,7 @@ function Insights() {
   const [user, setUser] = useState("");
   const [AuthUser, setAuthUser] = useState(false);
   const [chartData, setChartData] = useState({});
+  const [paymentChartData, setPaymentChartData] = useState({});
   const [noData, setNoData] = useState(false);
   const [lineChartData, setLineChartData] = useState({});
   const [lineChartOptions, setLineChartOptions] = useState({});
@@ -62,6 +63,7 @@ function Insights() {
 
           setBackdata(response.data.data);
           createChartData(response.data.data);
+          createPaymentChartData(response.data.data);
           createLineChartData(response.data.data);
           setUser(response.data.name);
 
@@ -114,6 +116,45 @@ function Insights() {
     };
 
     setChartData(chartData);
+    // Check if there is data for the applied filter
+    setNoData(data.length === 0);
+  };
+
+  const createPaymentChartData = (data) => {
+    const paymethod = {};
+    data.forEach((entry) => {
+      const paycategory = entry.payment_method;
+      paymethod[paycategory] = (paymethod[paycategory] || 0) + entry.Amount;
+    });
+
+    const paymentChartData = {
+      labels: Object.keys(paymethod),
+      datasets: [
+        {
+          data: Object.values(paymethod),
+          backgroundColor: [
+            "rgba(255, 99, 132, 0.7)",
+            "rgba(54, 162, 235, 0.7)",
+            "rgba(255, 206, 86, 0.7)",
+            "rgba(75, 192, 192, 0.7)",
+            "rgba(153, 102, 255, 0.7)",
+            "rgba(255, 159, 64, 0.7)",
+            "rgba(255, 0, 0, 0.7)", // Additional color
+          ],
+          hoverBackgroundColor: [
+            "rgba(255, 99, 132, 0.9)",
+            "rgba(54, 162, 235, 0.9)",
+            "rgba(255, 206, 86, 0.9)",
+            "rgba(75, 192, 192, 0.9)",
+            "rgba(153, 102, 255, 0.9)",
+            "rgba(255, 159, 64, 0.9)",
+            "rgba(255, 0, 0, 0.9)", // Additional hover color
+          ],
+        },
+      ],
+    };
+
+    setPaymentChartData(paymentChartData);
     // Check if there is data for the applied filter
     setNoData(data.length === 0);
   };
@@ -221,6 +262,7 @@ function Insights() {
       });
 
       createChartData(filteredData);
+      createPaymentChartData(filteredData);
     } catch (error) {
       console.error("Error filtering data:", error);
     }
@@ -230,6 +272,7 @@ function Insights() {
     setSelectedMonth("");
     setDisplayMonth("");
     createChartData(Backdata);
+    createPaymentChartData(Backdata);
   };
 
   const handleYearSubmit = (event) => {
@@ -277,37 +320,65 @@ function Insights() {
               Clear filter
             </button>
           </div>
-          <h3 className="cat-text">
-            Category wise breakup of{" "}
-            {DisplayMonth ? DisplayMonth : "all the expenses"}
-          </h3>
+          <div style={{ display: "flex", justifyContent: "space-around" }}>
+  <div style={{ maxWidth: "550px", margin: "auto" }}>
+    <h3 className="cat-text">
+      Category wise breakup of{" "}
+      {DisplayMonth ? DisplayMonth : "all the expenses"}
+    </h3>
+    {noData ? (
+      <p
+        style={{
+          color: "black",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        No data available for the selected filter.
+      </p>
+    ) : (
+      chartData.labels && (
+        <div style={{ background: "white" }}>
+          <Doughnut
+            data={chartData}
+            height={200} // Set the height as needed
+            width={200}  // Set the width as needed (same as height for equal size)
+          />
+        </div>
+      )
+    )}
+  </div>
 
-          <div
-            style={{ maxWidth: "550px", margin: "auto", background: "white" }}
-          >
-            {noData ? (
-              <p
-                style={{
-                  color: "black",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                No data available for the selected filter.
-              </p>
-            ) : (
-              chartData.labels && (
-                <Doughnut
-                  data={chartData}
-                  height={200} // Set the height as needed
-                  width={150} // Set the width as needed
-                  options={{
-                    responsive: true,
-                  }}
-                />
-              )
-            )}
-          </div>
+  <div style={{ maxWidth: "550px", margin: "auto" }}>
+    <h3 className="cat-text">
+      Payment wise breakup of{" "}
+      {DisplayMonth ? DisplayMonth : "all the expenses"}
+    </h3>
+    {noData ? (
+      <p
+        style={{
+          color: "black",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        No data available for the selected filter.
+      </p>
+    ) : (
+      chartData.labels && (
+        <div style={{ background: "white" }}>
+          <Doughnut
+            data={paymentChartData}
+            height={200} // Set the height as needed
+            width={200}  // Set the width as needed (same as height for equal size)
+          />
+        </div>
+      )
+    )}
+  </div>
+</div>
+
+
         </div>
 
         <div
