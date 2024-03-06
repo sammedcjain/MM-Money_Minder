@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const Expense = require("../models/expense.js");
+const User = require("../models/user.js");
 
 router.get("/", async (req, res) => {
   try {
+    console.log(req.user)
     const userExpense = await Expense.findOne({ user: req.user.id }).populate(
       "user"
     );
@@ -17,7 +19,18 @@ router.get("/", async (req, res) => {
     // Sort expenses array in ascending order based on the date
     userExpense.expense.sort((a, b) => a.date - b.date);
 
-    res.json(userExpense.expense);
+
+    //username for navbar
+    const user = await User.findById(req.user.id);
+    var username = "";
+    if (user) {
+      username = user.username;
+      console.log("User username:", username);
+    } else {
+      console.log("User not found");
+    }
+
+    res.json({data:userExpense.expense, name:username});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });

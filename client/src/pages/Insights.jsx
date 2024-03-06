@@ -1,16 +1,41 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-// import './main.css'; // Import your main.css file here
-// import './chart files/charty.css'; // Import your charty.css file here
 import { useMemo } from "react";
 import Navbar from "../components/Navbar";
 import { Doughnut, Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  BarController,
+  BarElement,
+} from "chart.js";
+import { Chart } from "react-chartjs-2";
 
+ChartJS.register(
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  BarController,
+  BarElement
+);
 function Insights() {
   const [Backdata, setBackdata] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState(2024);
   const [user, setUser] = useState("");
+  const [AuthUser, setAuthUser] = useState(false);
   const [chartData, setChartData] = useState({});
   const [noData, setNoData] = useState(false);
   const [lineChartData, setLineChartData] = useState({});
@@ -35,14 +60,18 @@ function Insights() {
             }
           );
 
-          setBackdata(response.data);
-          createChartData(response.data);
-          console.log(response.data)
-          createLineChartData(response.data);
+          setBackdata(response.data.data);
+          createChartData(response.data.data);
+          createLineChartData(response.data.data);
+          setUser(response.data.name);
+
+          setAuthUser(true);
         } else {
           console.error("Token not found");
+          setAuthUser(false);
         }
       } catch (error) {
+        setAuthUser(false);
         console.error("Error fetching data:", error);
       }
     };
@@ -99,18 +128,18 @@ function Insights() {
         const entryYear = entryDate.getFullYear();
         return entryMonth === month && entryYear === parseInt(selectedYear);
       });
-  
+
       const totalAmount = filteredData.reduce(
         (sum, entry) => sum + entry.Amount,
         0
       );
       return totalAmount;
     });
-
     const zeroData = Array(months.length).fill(0);
-  
+
     const updatedLineChartData = {
       labels: months.map((month) => {
+        // Format the month labels as desired (e.g., "Jan", "Feb", etc.)
         const monthNames = [
           "Jan",
           "Feb",
@@ -129,7 +158,7 @@ function Insights() {
       }),
       datasets: [
         {
-          label: "Monthly Expenses (Bar Chart)",
+          label: "Monthly Expenses",
           data: monthlyData,
           backgroundColor: "rgba(75,192,192,0.7)",
           borderColor: "rgba(75,192,192,1)",
@@ -137,7 +166,7 @@ function Insights() {
           type: "bar", // Set type to "bar" for the bar chart
         },
         {
-          label: "Monthly Expenses (Line Chart)",
+          label: "Monthly Expenses (Predicted)",
           data: zeroData,
           borderColor: "rgba(255, 0, 0, 1)",
           borderWidth: 2,
@@ -146,14 +175,12 @@ function Insights() {
         },
       ],
     };
-  
+
     setLineChartData(updatedLineChartData);
-  
+
     // Check if the total amount for all months is 0
     setNoLineData(monthlyData.every((amount) => amount === 0));
   };
-  
-  
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -216,7 +243,7 @@ function Insights() {
     <>
       <head>
         <link rel="icon" type="image/png" href="/landing_page/rupee.png" />
-        <title>PennyWise-Insights</title>
+        <title>MoneyMinder-Insights</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
@@ -224,13 +251,9 @@ function Insights() {
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         />
         <link rel="stylesheet" href="/Smart_Insights/main.css" />
-        {/* <link rel="stylesheet" href="/Smart_Insights/chart files/charty.css" /> */}
-        {/* Add other stylesheet links as needed */}
       </head>
       <body>
-        {/* Nav Bar */}
-        {/* Assuming you have a Nav component */}
-        <Navbar />
+        <Navbar user={user} />
 
         <div className="head container">
           <h1>Smart Insights</h1>
@@ -247,9 +270,14 @@ function Insights() {
               onChange={handleChange}
             />
 
-            <button className="inp-but">Apply filter</button>
+            <button className="inp-but">+</button>
           </form>
-          <button onClick={clearFilter}>Clear filter</button>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <button className="inp-but mid_button" onClick={clearFilter}
+            style={{ background: "#401c64" }}>
+              Clear filter
+            </button>
+          </div>
           <h3 className="cat-text">
             Category wise breakup of{" "}
             {DisplayMonth ? DisplayMonth : "all the expenses"}
@@ -259,7 +287,15 @@ function Insights() {
             style={{ maxWidth: "550px", margin: "auto", background: "white" }}
           >
             {noData ? (
-              <p>No data available for the selected filter.</p>
+              <p
+                style={{
+                  color: "black",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                No data available for the selected filter.
+              </p>
             ) : (
               chartData.labels && (
                 <Doughnut
@@ -296,14 +332,22 @@ function Insights() {
             />
 
             <button className="inp-but" type="submit">
-              Apply filter
+              +
             </button>
           </form>
           <div
             style={{ maxWidth: "800px", margin: "auto", background: "white" }}
           >
             {noLineData ? (
-              <p>No data available for the selected filter.</p>
+              <p
+                style={{
+                  color: "black",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                No data available for the selected filter.
+              </p>
             ) : (
               lineChartData.labels && (
                 <Line

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import $ from "jquery";
 import Navbar from "../components/Navbar";
 import LoadingPage from "../components/Loading";
 import NotAuth from "../components/NotAuth";
@@ -52,8 +51,12 @@ function Dashboard() {
       });
     });
   };
-  const handleFetchData = async () => {
+  const handleFetchData = async (post) => {
     try {
+      if(post === false){
+        setLoading(true)
+      }
+
       const token = localStorage.getItem("token");
       console.log(token);
       if (token) {
@@ -70,24 +73,26 @@ function Dashboard() {
         console.log(response.data);
         setExpenses(response.data.expenses);
         setItems(response.data.items);
-        setUser(response.data.user);
+        console.log(response.data.user);
 
+        setUser(response.data.user);
+        setLoading(false);
         setAuthUser(true);
       } else {
         console.error("Token not found");
         setAuthUser(false);
+        setLoading(false);
         // Handle the case where the token is not available or not valid
       }
     } catch (error) {
       setAuthUser(false);
       console.error("Error fetching data:", error);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    setLoading(true);
-    handleFetchData();
-    setLoading(false);
+    handleFetchData(false);
   }, []);
 
   async function handleSubmit(e) {
@@ -122,7 +127,7 @@ function Dashboard() {
             position: "bottom-right",
           });
         } else if (res.data) {
-          handleFetchData();
+          handleFetchData(false);
           toast.success(res.data.message, {
             duration: 3000,
             position: "bottom-right",
@@ -170,7 +175,7 @@ function Dashboard() {
             position: "bottom-right",
           });
         } else if (res.data) {
-          handleFetchData();
+          handleFetchData(false);
 
           toast.success(res.data.message, {
             duration: 3000,
@@ -194,6 +199,14 @@ function Dashboard() {
     const dateInput = document.getElementById("date-input");
     const currentDate = new Date(dateInput.value);
     const nextDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+    const today = new Date();
+    if (nextDate > today) {
+      toast.error("Invalid Date!", {
+        duration: 3000,
+        position: "top-right",
+      });
+      return;
+    }
     dateInput.value = nextDate.toISOString().split("T")[0];
   };
 
@@ -213,9 +226,6 @@ function Dashboard() {
       <>
         <Toaster />
         <link rel="icon" type="image/png" href="/landing_page/rupee.png" />
-        <title>PennyWise-Dashboard</title>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
           rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -241,6 +251,7 @@ function Dashboard() {
                 name="date"
                 onChange={handleChange}
                 value={formData.date}
+                max={new Date().toISOString().split("T")[0]}
                 required
               />
               <label htmlFor="item">Item:</label>
@@ -288,7 +299,7 @@ function Dashboard() {
 
           {/* dashboard card notes */}
           <div className="scrolling-wrapper">
-            {expenses.reverse().map((expenseItem) => (
+            {[...expenses].reverse().map((expenseItem) => (
               <section
                 key={expenseItem._id}
                 className="my-5"
@@ -355,6 +366,8 @@ function Dashboard() {
                     className="form-control"
                     id="date-input"
                     name="date_input"
+                    value={new Date().toISOString().split("T")[0]}
+                    max={new Date().toISOString().split("T")[0]}
                   />
                   <div className="input-group-append">
                     <span
@@ -413,7 +426,7 @@ function Dashboard() {
           <div className="container table-responsive">
             <table id="data-table">
               <thead>
-                <tr>
+                <tr id="table-data">
                   <th>Item</th>
                   <th>Amount in Rs</th>
                   <th>Date</th>
@@ -447,7 +460,7 @@ function Dashboard() {
         </div>
 
         {/* links to other pages */}
-        <div className="forth">
+        {/* <div className="forth">
           <a href={`/${user}/insights`}>
             <button
               style={{ marginBottom: "10px" }}
@@ -468,7 +481,7 @@ function Dashboard() {
               Track Loans
             </button>
           </a>
-        </div>
+        </div> */}
 
         <script
           src="https://kit.fontawesome.com/1465e7da9e.js"

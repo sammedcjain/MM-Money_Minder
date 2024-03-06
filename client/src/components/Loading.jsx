@@ -5,7 +5,7 @@ function Loading({ first }) {
     <div>
       <div
         style={{
-          background: "black",
+          background: "#633491",
           marginTop: "300px",
           marginBottom: "50px",
           display: "flex",
@@ -13,8 +13,8 @@ function Loading({ first }) {
           justifyContent: "center",
         }}
       >
-        <style>{`body { background: black; font-family: 'Arial', sans-serif; }`}</style>
-        <MoonLoader color={"#90ee90"} loading={true} />
+        <style>{`body { background: #633491; font-family: 'Arial', sans-serif; }`}</style>
+        <MoonLoader color={"white"} loading={true} />
       </div>
       <div style={{ textAlign: "center", marginTop: "10px" }}>
         {first && (
