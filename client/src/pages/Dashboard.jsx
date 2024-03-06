@@ -51,12 +51,8 @@ function Dashboard() {
       });
     });
   };
-  const handleFetchData = async (post) => {
+  const handleFetchData = async () => {
     try {
-      if(post === false){
-        setLoading(true)
-      }
-
       const token = localStorage.getItem("token");
       console.log(token);
       if (token) {
@@ -76,23 +72,23 @@ function Dashboard() {
         console.log(response.data.user);
 
         setUser(response.data.user);
-        setLoading(false);
+
         setAuthUser(true);
       } else {
         console.error("Token not found");
         setAuthUser(false);
-        setLoading(false);
         // Handle the case where the token is not available or not valid
       }
     } catch (error) {
       setAuthUser(false);
       console.error("Error fetching data:", error);
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    handleFetchData(false);
+    setLoading(true);
+    handleFetchData();
+    setLoading(false);
   }, []);
 
   async function handleSubmit(e) {
@@ -127,7 +123,7 @@ function Dashboard() {
             position: "bottom-right",
           });
         } else if (res.data) {
-          handleFetchData(false);
+          handleFetchData();
           toast.success(res.data.message, {
             duration: 3000,
             position: "bottom-right",
@@ -175,7 +171,7 @@ function Dashboard() {
             position: "bottom-right",
           });
         } else if (res.data) {
-          handleFetchData(false);
+          handleFetchData();
 
           toast.success(res.data.message, {
             duration: 3000,
@@ -299,7 +295,7 @@ function Dashboard() {
 
           {/* dashboard card notes */}
           <div className="scrolling-wrapper">
-            {[...expenses].reverse().map((expenseItem) => (
+            {expenses.reverse().map((expenseItem) => (
               <section
                 key={expenseItem._id}
                 className="my-5"

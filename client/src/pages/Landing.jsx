@@ -146,7 +146,7 @@ function Landing() {
                   </div>
                 </div>
                 <div class="col-sm-6 col-md-3 col-lg-3  d-flex flex-column  justify-content-around">
-                  {/* <div class="alt-features-item">
+                  <div class="alt-features-item">
                     <div class="alt-features-icon">
                       <span class="icon-camera"></span>
                     </div>
@@ -158,7 +158,7 @@ function Landing() {
                     </h3>
                     With MoneyMinder, users can store their loan data in the
                     database & users can also track all the loans at one place
-                  </div> */}
+                  </div>
                   <div class="alt-features-item">
                     <div class="alt-features-icon">
                       <span class="icon-mobile"></span>
